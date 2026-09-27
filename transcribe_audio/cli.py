@@ -78,9 +78,18 @@ def transcribe():
             response = operation.result(timeout=90)
             print("response:", response)
             text = "None"
+            # if len(response.results) > 0:
+            #     text = response.results[0].alternatives[0].transcript
+            #     print(text)
             if len(response.results) > 0:
-                text = response.results[0].alternatives[0].transcript
+                transcripts = []
+                for result in response.results:
+                    if len(result.alternatives) > 0:
+                        transcripts.append(result.alternatives[0].transcript)
+                
+                text = "".join(transcripts) 
                 print(text)
+
 
             # Save the transcription
             with open(text_file, "w") as f:
