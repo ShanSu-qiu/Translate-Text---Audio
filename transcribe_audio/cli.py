@@ -14,11 +14,11 @@ from tempfile import TemporaryDirectory
 # Generate the inputs arguments parser
 parser = argparse.ArgumentParser(description="Command description.")
 
-gcp_project = "ac215-project"
-bucket_name = "mega-pipeline-bucket"
+gcp_project = "project-e8f5a204-d5ce-4c07-9c7"
+bucket_name = "sophie-mega-pipeline"
 input_audios = "input_audios"
 text_prompts = "text_prompts"
-group_name = "pavlos" # This needs to be your Group name e.g: group-01, group-02, group-03, group-04, group-05, ...
+group_name = "sophies" # This needs to be your Group name e.g: group-01, group-02, group-03, group-04, group-05, ...
 
 
 def makedirs():
@@ -73,7 +73,12 @@ def transcribe():
 
             # Transcribe
             audio = speech.RecognitionAudio(content=content)
-            config = speech.RecognitionConfig(language_code="en-US")
+            config = speech.RecognitionConfig(
+                language_code="en-US",
+                enable_automatic_punctuation=True,
+                model="latest_long",
+                speech_contexts=[speech.SpeechContext(phrases=["pipeline"])],
+                )
             operation = client.long_running_recognize(config=config, audio=audio)
             response = operation.result(timeout=90)
             print("response:", response)
