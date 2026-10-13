@@ -1,0 +1,4 @@
+secrets/
+input_audios/
+text_prompts/
+.venv/
