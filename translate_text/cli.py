@@ -11,11 +11,11 @@ from google.cloud import translate_v2 as translate
 # Generate the inputs arguments parser
 parser = argparse.ArgumentParser(description="Command description.")
 
-gcp_project = "ac215-project"
-bucket_name = "mega-pipeline-bucket"
+gcp_project = "project-e8f5a204-d5ce-4c07-9c7"
+bucket_name = "sophie-mega-pipeline"
 text_paragraphs = "text_paragraphs"
 text_translated = "text_translated"
-group_name = "pavlos" # This needs to be your Group name e.g: group-01, group-02, group-03, group-04, group-05, ...
+group_name = "sophies" # This needs to be your Group name e.g: group-01, group-02, group-03, group-04, group-05, ...
 
 translate_client = translate.Client()
 
@@ -74,7 +74,7 @@ def upload():
     makedirs()
 
     # Upload to bucket
-    storage_client = storage.Client()
+    storage_client = storage.Client(project=gcp_project)
     bucket = storage_client.bucket(bucket_name)
 
     # Get the list of text file
