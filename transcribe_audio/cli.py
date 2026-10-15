@@ -33,7 +33,7 @@ def download():
     shutil.rmtree(input_audios, ignore_errors=True, onerror=None)
     makedirs()
 
-    client = storage.Client()
+    client = storage.Client(project=gcp_project)
     bucket = client.get_bucket(bucket_name)
 
     blobs = bucket.list_blobs(prefix=input_audios+"/")
@@ -106,7 +106,7 @@ def upload():
     makedirs()
 
     # Upload to bucket
-    storage_client = storage.Client()
+    storage_client = storage.Client(project=gcp_project)
     bucket = storage_client.bucket(bucket_name)
 
     # Get the list of text file
