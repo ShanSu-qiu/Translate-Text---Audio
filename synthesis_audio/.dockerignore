@@ -1,0 +1,5 @@
+secrets/
+text_translated/
+output_audios/
+output_audios_pp/
+.venv/

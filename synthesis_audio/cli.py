@@ -11,11 +11,11 @@ from google.cloud import texttospeech
 # Generate the inputs arguments parser
 parser = argparse.ArgumentParser(description="Command description.")
 
-gcp_project = "ac215-project"
-bucket_name = "mega-pipeline-bucket"
+gcp_project = "project-e8f5a204-d5ce-4c07-9c7"
+bucket_name = "sophie-mega-pipeline"
 output_audios = "output_audios"
 text_translated = "text_translated"
-group_name = "pavlos" # This needs to be your Group name e.g: group-01, group-02, group-03, group-04, group-05, ...
+group_name = "sophies" # This needs to be your Group name e.g: group-01, group-02, group-03, group-04, group-05, ...
 
 # Instantiates a client
 client = texttospeech.TextToSpeechLongAudioSynthesizeClient()
@@ -60,7 +60,7 @@ def synthesis():
             input_text = f.read()
         
         # Check if audio file already exists
-        storage_client = storage.Client()
+        storage_client = storage.Client(project=gcp_project)
         bucket = storage_client.bucket(bucket_name)
         audio_blob_name = f"{output_audios}/{group_name}/{uuid}.mp3"
         blob = bucket.blob(audio_blob_name)
