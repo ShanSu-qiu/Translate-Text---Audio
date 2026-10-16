@@ -6,11 +6,13 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel
 
+from pipeline import PlanError, SUPPORTED_LANGUAGES
+
 GCP_PROJECT = "project-e8f5a204-d5ce-4c07-9c7"
 GCP_LOCATION = "us-central1"
 DEFAULT_MODEL = "gemini-2.5-flash-lite"
 
-# Kept in sync with SUPPORTED_LANGUAGES in api.py
+# Kept in sync with SUPPORTED_LANGUAGES in pipeline.py
 Language = Literal["en", "fr", "es", "de", "it", "ja", "zh"]
 Intent = Literal["transcript", "podcast_text", "translated_text", "audio", "unsupported"]
 
@@ -60,3 +62,13 @@ def classify(query):
     if response.parsed is None:
         raise ValueError(f"Could not parse classifier output: {response.text}")
     return response.parsed
+
+
+def check_classification(result):
+    """Raise PlanError when the classified request cannot be run."""
+    if result.intent == "unsupported":
+        raise PlanError(f"this request is not something the pipeline can do: {result.reason}")
+    if result.unsupported_languages:
+        raise PlanError(
+            f"unsupported languages {result.unsupported_languages}, choose from {SUPPORTED_LANGUAGES}"
+        )

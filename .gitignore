@@ -13,3 +13,4 @@ outputs
 /frontend
 /.idea
 __pycache__/
+.pytest_cache/
