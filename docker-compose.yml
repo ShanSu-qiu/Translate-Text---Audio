@@ -13,10 +13,6 @@ services:
     <<: *common
     build: ./generate_text
     volumes: ["./generate_text:/app"]
-  synthesis-audio-en:
-    <<: *common
-    build: ./synthesis_audio_en
-    volumes: ["./synthesis_audio_en:/app"]
   translate-text:
     <<: *common
     build: ./translate_text
@@ -28,4 +24,5 @@ services:
   orchestrator:
     build: ./orchestrator
     ports: ["9000:8000"]
-    depends_on: [transcribe-audio, generate-text, synthesis-audio-en, translate-text, synthesis-audio]
+    volumes: ["./orchestrator:/app"]  # classifier reads secrets/ for Gemini
+    depends_on: [transcribe-audio, generate-text, translate-text, synthesis-audio]
