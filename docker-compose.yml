@@ -24,5 +24,11 @@ services:
   orchestrator:
     build: ./orchestrator
     ports: ["9000:8000"]
-    volumes: ["./orchestrator:/app"]  # classifier reads secrets/ for Gemini
+    volumes:
+      - ./orchestrator:/app   # classifier reads secrets/ for Gemini
+      - ./web:/web:ro         # static UI served at http://localhost:9000
+    environment:
+      WEB_DIR: /web
+      # Add the deployed UI origin here (comma separated) when the UI is hosted elsewhere, e.g. Vercel
+      ALLOWED_ORIGINS: http://localhost:9000,http://127.0.0.1:9000
     depends_on: [transcribe-audio, generate-text, translate-text, synthesis-audio]

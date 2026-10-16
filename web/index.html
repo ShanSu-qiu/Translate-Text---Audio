@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>多语言播客工作室 · Mega Pipeline</title>
+  <meta name="description" content="上传一段英文录音，用一句话说出你想要什么，自动生成多语言的播客文稿与音频。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23d6452b'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="masthead">
+    <div class="masthead__top">
+      <p class="kicker">Mega Pipeline · 多语言播客工作室</p>
+      <p class="onair" aria-hidden="true"><span class="onair__lamp"></span>On Air</p>
+    </div>
+    <h1 class="masthead__title">一段录音，<br><em>任何语言</em><span class="nowrap">的播客。</span></h1>
+    <p class="masthead__lede">
+      上传或现场录一段英文音频，再用一句话说出你想要什么：转写、文稿、翻译，还是配好音的节目。
+      流水线会自己安排步骤。
+    </p>
+  </header>
+
+  <p class="banner" id="banner" role="alert" hidden></p>
+
+  <main id="main" class="studio">
+    <section class="panel panel--intake" aria-labelledby="intake-heading">
+      <header class="section-head">
+        <span class="section-head__num" aria-hidden="true">01</span>
+        <h2 id="intake-heading">素材</h2>
+        <p class="section-head__note">英文录音 · 最大 10 MB</p>
+      </header>
+
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="file-input" class="visually-hidden" accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.flac">
+        <label for="file-input" class="dropzone__label">
+          <span class="dropzone__title">拖入音频文件</span>
+          <span class="dropzone__or">或 <span class="link">从电脑选择</span></span>
+        </label>
+        <p class="dropzone__formats">MP3 · WAV · M4A · WEBM · OGG · FLAC</p>
+      </div>
+
+      <p class="divider"><span>或者现场录</span></p>
+
+      <div class="recorder" id="recorder"></div>
+
+      <p class="status" id="intake-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel panel--request" aria-labelledby="request-heading">
+      <header class="section-head">
+        <span class="section-head__num" aria-hidden="true">02</span>
+        <h2 id="request-heading">指令</h2>
+        <p class="section-head__note">用你自己的话说</p>
+      </header>
+
+      <form class="cue-card" id="request-form" novalidate>
+        <label for="query" class="cue-card__label">你想要什么？</label>
+        <textarea id="query" name="query" rows="3" maxlength="500" required
+          placeholder="例如：我想听中文和西班牙语版的播客"></textarea>
+        <div class="cue-card__footer">
+          <div class="examples" role="group" aria-label="示例指令">
+            <button type="button" class="chip chip--example">我想听中文和英文版的播客</button>
+            <button type="button" class="chip chip--example">把文稿翻译成日语和法语</button>
+            <button type="button" class="chip chip--example">只要录音的转写文字</button>
+          </div>
+          <button type="submit" class="btn btn--signal" id="submit">
+            开始制作 <kbd class="kbd" aria-hidden="true">⌘↵</kbd>
+          </button>
+        </div>
+      </form>
+      <p class="supported" id="supported"></p>
+
+      <div class="job" id="job" hidden></div>
+    </section>
+
+    <section class="panel panel--library" aria-labelledby="library-heading">
+      <header class="section-head">
+        <span class="section-head__num" aria-hidden="true">03</span>
+        <h2 id="library-heading">成品</h2>
+        <p class="section-head__note">每次制作都会处理所有还没处理过的录音</p>
+        <button type="button" class="btn btn--quiet" id="refresh">刷新</button>
+      </header>
+      <ol class="log" id="recordings" aria-label="录音列表"></ol>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>转写 · 撰稿 · 翻译 · 配音 &mdash; Google Speech-to-Text, Gemini, Translation, Text-to-Speech</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
