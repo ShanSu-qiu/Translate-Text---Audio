@@ -3,6 +3,8 @@ name = "synthesis-audio"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "fastapi>=0.143.3",
     "google-cloud-storage>=3.17.0",
     "google-cloud-texttospeech>=2.38.0",
+    "uvicorn>=0.54.0",
 ]

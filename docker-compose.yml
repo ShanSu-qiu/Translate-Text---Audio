@@ -1,0 +1,31 @@
+x-common: &common
+  environment:
+    GOOGLE_CLOUD_PROJECT: project-e8f5a204-d5ce-4c07-9c7
+  # Dockerfile defaults to an interactive shell; run the HTTP server instead
+  command: ["-c", "source /home/app/.venv/bin/activate && uvicorn server:app --host 0.0.0.0 --port 8000"]
+
+services:
+  transcribe-audio:
+    <<: *common
+    build: ./transcribe_audio
+    volumes: ["./transcribe_audio:/app"]
+  generate-text:
+    <<: *common
+    build: ./generate_text
+    volumes: ["./generate_text:/app"]
+  synthesis-audio-en:
+    <<: *common
+    build: ./synthesis_audio_en
+    volumes: ["./synthesis_audio_en:/app"]
+  translate-text:
+    <<: *common
+    build: ./translate_text
+    volumes: ["./translate_text:/app"]
+  synthesis-audio:
+    <<: *common
+    build: ./synthesis_audio
+    volumes: ["./synthesis_audio:/app"]
+  orchestrator:
+    build: ./orchestrator
+    ports: ["9000:8000"]
+    depends_on: [transcribe-audio, generate-text, synthesis-audio-en, translate-text, synthesis-audio]

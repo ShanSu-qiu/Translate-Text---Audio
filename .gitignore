@@ -12,3 +12,4 @@ outputs
 /deployment
 /frontend
 /.idea
+__pycache__/
