@@ -9,6 +9,7 @@ app = FastAPI()
 @app.post("/run")
 def run():
     cli.download()
-    cli.transcribe()
+    failures = cli.transcribe()
     cli.upload()
-    return {"status": "ok"}
+    # Recordings that could not be transcribed are reported, not fatal, so the rest still flow on
+    return {"status": "ok", "failed": [{"id": rec_id, "error": error} for rec_id, error in failures]}

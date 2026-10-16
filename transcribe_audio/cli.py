@@ -43,18 +43,70 @@ def download():
             blob.download_to_filename(blob.name)
 
 
+# Speech-to-Text only takes about a minute of inline audio, so longer recordings are
+# converted to 16 kHz mono 16-bit FLAC (what it recommends for speech), staged in the
+# bucket and recognized from there. The staged copy is deleted afterwards.
+SPEECH_SAMPLE_RATE = 16000
+SPEECH_STAGING = "speech_staging"
+RECOGNIZE_TIMEOUT_SECONDS = 300
+
+
+def to_speech_flac(audio_path, flac_path):
+    stream = ffmpeg.input(audio_path)
+    stream = ffmpeg.output(stream, flac_path, ar=SPEECH_SAMPLE_RATE, ac=1, sample_fmt="s16")
+    ffmpeg.run(stream, overwrite_output=True, quiet=True)
+
+
+def transcribe_file(client, bucket, uuid, audio_path):
+    staged = bucket.blob(f"{SPEECH_STAGING}/{group_name}/{uuid}.flac")
+    with TemporaryDirectory() as audio_dir:
+        flac_path = os.path.join(audio_dir, "audio.flac")
+        try:
+            to_speech_flac(audio_path, flac_path)
+        except ffmpeg.Error:
+            raise ValueError("could not read this audio file")
+        staged.upload_from_filename(flac_path)
+
+    try:
+        audio = speech.RecognitionAudio(uri=f"gs://{bucket_name}/{staged.name}")
+        config = speech.RecognitionConfig(
+            language_code="en-US",
+            enable_automatic_punctuation=True,
+            model="latest_long",
+            speech_contexts=[speech.SpeechContext(phrases=["pipeline"])],
+            )
+        operation = client.long_running_recognize(config=config, audio=audio)
+        response = operation.result(timeout=RECOGNIZE_TIMEOUT_SECONDS)
+    finally:
+        staged.delete()
+    print("response:", response)
+
+    # Google Speech-to-Text breaks longer audio into chunks separated by natural pauses
+    transcripts = [
+        result.alternatives[0].transcript
+        for result in response.results
+        if len(result.alternatives) > 0
+    ]
+    return "".join(transcripts) if transcripts else "None"
+
+
 def transcribe():
+    """Transcribe every new recording. One bad recording must not block the others,
+    so failures are collected and returned as [(recording id, error message)]."""
     print("transcribe")
     makedirs()
 
     # Speech client
     client = speech.SpeechClient()
+    bucket = storage.Client(project=gcp_project).bucket(bucket_name)
+    failures = []
 
     # Get the list of audio file
     audio_files = os.listdir(input_audios)
 
     for audio_path in audio_files:
-        uuid = audio_path.replace(".mp3", "")
+        # Any format ffmpeg can read works (mp3, wav, m4a, webm from browser recordings, ...)
+        uuid = os.path.splitext(audio_path)[0]
         audio_path = os.path.join(input_audios, audio_path)
         text_file = os.path.join(text_prompts, group_name, uuid + ".txt")
 
@@ -62,43 +114,19 @@ def transcribe():
             continue
 
         print("Transcribing:", audio_path)
-        with TemporaryDirectory() as audio_dir:
-            flac_path = os.path.join(audio_dir, "audio.flac")
-            stream = ffmpeg.input(audio_path)
-            stream = ffmpeg.output(stream, flac_path)
-            ffmpeg.run(stream)
+        try:
+            text = transcribe_file(client, bucket, uuid, audio_path)
+        except Exception as e:
+            print("Failed:", audio_path, e)
+            failures.append((uuid, str(e)))
+            continue
+        print(text)
 
-            with io.open(flac_path, "rb") as audio_file:
-                content = audio_file.read()
+        # Save the transcription
+        with open(text_file, "w") as f:
+            f.write(text)
 
-            # Transcribe
-            audio = speech.RecognitionAudio(content=content)
-            config = speech.RecognitionConfig(
-                language_code="en-US",
-                enable_automatic_punctuation=True,
-                model="latest_long",
-                speech_contexts=[speech.SpeechContext(phrases=["pipeline"])],
-                )
-            operation = client.long_running_recognize(config=config, audio=audio)
-            response = operation.result(timeout=90)
-            print("response:", response)
-            text = "None"
-            # if len(response.results) > 0:
-            #     text = response.results[0].alternatives[0].transcript
-            #     print(text)
-            if len(response.results) > 0:
-                transcripts = []
-                for result in response.results:
-                    if len(result.alternatives) > 0:
-                        transcripts.append(result.alternatives[0].transcript)
-                
-                text = "".join(transcripts) 
-                print(text)
-
-
-            # Save the transcription
-            with open(text_file, "w") as f:
-                f.write(text)
+    return failures
 
 
 def upload():
