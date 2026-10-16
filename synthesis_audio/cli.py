@@ -27,6 +27,7 @@ VOICES = {
     "de": ("de-DE", "de-DE-Standard-G"),
     "it": ("it-IT", "it-IT-Standard-E"),
     "ja": ("ja-JP", "ja-JP-Standard-A"),
+    "zh": ("cmn-CN", "cmn-CN-Standard-A"),
 }
 
 # Instantiates a client

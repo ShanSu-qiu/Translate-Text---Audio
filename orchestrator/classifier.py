@@ -11,7 +11,7 @@ GCP_LOCATION = "us-central1"
 DEFAULT_MODEL = "gemini-2.5-flash-lite"
 
 # Kept in sync with SUPPORTED_LANGUAGES in api.py
-Language = Literal["en", "fr", "es", "de", "it", "ja"]
+Language = Literal["en", "fr", "es", "de", "it", "ja", "zh"]
 Intent = Literal["transcript", "podcast_text", "translated_text", "audio", "unsupported"]
 
 
@@ -34,7 +34,7 @@ Pick exactly one intent:
 - unsupported: the request has nothing to do with this pipeline.
 
 Languages, as codes: en (English), fr (French), es (Spanish), de (German), it (Italian),
-ja (Japanese). Map any way the user names a language, in any language, to these codes.
+ja (Japanese), zh (Chinese / Mandarin). Map any way the user names a language, in any language, to these codes.
 - Put every requested language that is not in that list into unsupported_languages,
   using its English name.
 - For audio with no language mentioned, use ["en"].

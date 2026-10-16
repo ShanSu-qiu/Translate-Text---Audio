@@ -8,7 +8,7 @@ from classifier import classify
 
 SOURCE_LANGUAGE = "en"
 # Must match the VOICES table in synthesis_audio/cli.py and Language in classifier.py
-SUPPORTED_LANGUAGES = ["en", "fr", "es", "de", "it", "ja"]
+SUPPORTED_LANGUAGES = ["en", "fr", "es", "de", "it", "ja", "zh"]
 
 SERVICES = {
     "transcribe": "http://transcribe-audio:8000",
