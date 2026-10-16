@@ -5,6 +5,7 @@ ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
 ENV UV_LINK_MODE=copy
 ENV UV_PROJECT_ENVIRONMENT=/home/app/.venv
+ENV GOOGLE_APPLICATION_CREDENTIALS=secrets/mega-pipeline.json
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install uv && \
